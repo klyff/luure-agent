@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Servidor {
+  id                       String   @id @default(cuid())
+  cpf                      String   @unique
+  nome                     String
+  matricula                String   @unique
+  cargo                    String
+  orgao                    String
+  secretaria               String
+  vinculoAtivo             Boolean
+  dataAdmissao             DateTime
+  fotoHash                 String
+  margemDisponivelCentavos Int
+  nivelContaGovbr          String // "prata" | "ouro"
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  @@index([matricula])
+  @@index([orgao])
+}
+
+model CredentialOffer {
+  id                String   @id @default(cuid())
+  preAuthorizedCode String   @unique
+  txCode            String
+  vct               String
+  servidorCpf       String
+  status            String // "pending" | "claimed" | "expired"
+  expiresAt         DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([servidorCpf])
+  @@index([status])
+}
+
+model CredentialIssued {
+  id              String   @id @default(cuid())
+  vct             String
+  servidorCpf     String
+  statusListIndex Int      @unique
+  revoked         Boolean  @default(false)
+  sdJwtHash       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([servidorCpf])
+  @@index([vct])
+}
+
+// Estado OAuth/OID4VCI efêmero (auth codes, access tokens). Persistido no
+// banco porque em serverless cada invocação pode cair em instância diferente.
+model EphemeralEntry {
+  key       String   @id
+  value     String // JSON
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
+model VerificationSession {
+  id              String   @id @default(cuid())
+  nonce           String
+  state           String   @unique
+  vct             String
+  requestedClaims String // JSON array of claim names
+  status          String // "pending" | "verified" | "rejected"
+  resultClaims    String? // JSON object
+  reason          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status])
+}

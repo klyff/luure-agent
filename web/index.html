@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SovereignID — Portal de Demonstração SOU.SP 2.0</title>
+  <style>
+    :root {
+      --azul: #1351B4;
+      --azul-escuro: #0C326F;
+      --verde: #168821;
+      --vermelho: #E52207;
+      --cinza: #F8F8F8;
+      --borda: #DDDDDD;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--cinza);
+      color: #333;
+    }
+    header {
+      background: var(--azul);
+      color: #fff;
+      padding: 16px 24px;
+    }
+    header h1 { margin: 0; font-size: 20px; font-weight: 600; }
+    header p { margin: 4px 0 0; font-size: 13px; opacity: 0.9; }
+    main {
+      max-width: 960px;
+      margin: 24px auto;
+      padding: 0 16px;
+      display: grid;
+      gap: 24px;
+    }
+    section {
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 8px;
+      padding: 24px;
+    }
+    h2 {
+      margin: 0 0 16px;
+      font-size: 17px;
+      color: var(--azul-escuro);
+      border-bottom: 2px solid var(--azul);
+      padding-bottom: 8px;
+    }
+    label { font-size: 14px; font-weight: 600; display: block; margin: 12px 0 4px; }
+    select, button {
+      font: inherit;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--borda);
+    }
+    button.primario {
+      background: var(--azul);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button.primario:hover { background: var(--azul-escuro); }
+    button.secundario {
+      background: #fff;
+      color: var(--azul);
+      border: 1px solid var(--azul);
+      cursor: pointer;
+    }
+    .claims { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 8px 0; }
+    .claims label {
+      font-weight: 400; display: flex; align-items: center; gap: 6px; margin: 0;
+    }
+    .qr-area { display: flex; gap: 24px; align-items: flex-start; margin-top: 16px; flex-wrap: wrap; }
+    .qr-area img { width: 220px; height: 220px; border: 1px solid var(--borda); border-radius: 8px; }
+    .deeplink {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 12px;
+      background: var(--cinza);
+      border: 1px solid var(--borda);
+      border-radius: 6px;
+      padding: 8px;
+      word-break: break-all;
+      max-width: 560px;
+    }
+    .status { margin-top: 12px; font-size: 14px; }
+    .status.pending::before { content: "⏳ "; }
+    .status.verified { color: var(--verde); font-weight: 600; }
+    .status.rejected { color: var(--vermelho); font-weight: 600; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; font-size: 14px; }
+    th, td { border: 1px solid var(--borda); padding: 8px 10px; text-align: left; }
+    th { background: var(--cinza); }
+    .tx-code { font-size: 22px; font-weight: 700; letter-spacing: 4px; color: var(--azul-escuro); }
+    .muted { color: #777; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SovereignID · Portal de Demonstração</h1>
+    <p>PoC SOU.SP 2.0 — credenciais verificáveis (SD-JWT VC) do servidor público de São Paulo</p>
+  </header>
+
+  <main>
+    <section id="verificador">
+      <h2>Verificar credencial (demo verificador)</h2>
+
+      <label for="vct">Tipo de credencial</label>
+      <select id="vct">
+        <option value="urn:sovereignid:sp:funcional">Carteira Funcional</option>
+        <option value="urn:sovereignid:sp:margem-consignavel">Margem Consignável</option>
+      </select>
+
+      <label>Claims a solicitar</label>
+      <div class="claims" id="claims"></div>
+
+      <button class="primario" id="gerar-qr">Gerar QR</button>
+
+      <div id="sessao-area" hidden>
+        <div class="qr-area">
+          <img id="sessao-qr" alt="QR code da solicitação de apresentação" />
+          <div>
+            <p class="muted">Escaneie com a wallet ou copie o deeplink:</p>
+            <div class="deeplink" id="sessao-deeplink"></div>
+            <button class="secundario" id="copiar-deeplink">Copiar deeplink</button>
+          </div>
+        </div>
+        <p class="status pending" id="sessao-status">Aguardando apresentação…</p>
+        <div id="sessao-resultado"></div>
+      </div>
+    </section>
+
+    <section id="emissor">
+      <h2>Emitir credencial (demo emissor)</h2>
+      <p class="muted">Servidores da base simulada SOU.SP:</p>
+      <table>
+        <thead>
+          <tr><th>Nome</th><th>CPF</th><th>Cargo</th><th>Órgão</th><th>Vínculo</th><th></th></tr>
+        </thead>
+        <tbody id="servidores"></tbody>
+      </table>
+
+      <label for="vct-emissao">Tipo de credencial a emitir</label>
+      <select id="vct-emissao">
+        <option value="urn:sovereignid:sp:funcional">Carteira Funcional</option>
+        <option value="urn:sovereignid:sp:margem-consignavel">Margem Consignável</option>
+      </select>
+
+      <div id="oferta-area" hidden>
+        <div class="qr-area">
+          <img id="oferta-qr" alt="QR code da oferta de credencial" />
+          <div>
+            <p class="muted">Código de confirmação (tx_code):</p>
+            <p class="tx-code" id="oferta-txcode"></p>
+            <p class="muted">Deeplink da oferta:</p>
+            <div class="deeplink" id="oferta-deeplink"></div>
+            <button class="secundario" id="copiar-oferta">Copiar deeplink</button>
+          </div>
+        </div>
+      </div>
+      <p class="status rejected" id="oferta-erro" hidden></p>
+    </section>
+  </main>
+
+  <script>
+    const CLAIMS = {
+      'urn:sovereignid:sp:funcional': [
+        'nome', 'cpf_mascarado', 'matricula', 'cargo', 'orgao',
+        'secretaria', 'vinculo_ativo', 'data_admissao', 'foto_hash',
+      ],
+      'urn:sovereignid:sp:margem-consignavel': [
+        'matricula', 'margem_disponivel_centavos', 'faixa_margem', 'competencia',
+      ],
+    };
+    const DEFAULT_CHECKED = ['nome', 'cargo', 'matricula', 'faixa_margem'];
+
+    const $ = (id) => document.getElementById(id);
+    let pollTimer = null;
+
+    // Escape de HTML para dados vindos da API/apresentações (FINDINGS A-15).
+    const esc = (v) => String(v).replace(/[&<>"']/g, (ch) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[ch]));
+
+    function renderClaims() {
+      const vct = $('vct').value;
+      $('claims').innerHTML = CLAIMS[vct]
+        .map((c) => `<label><input type="checkbox" value="${c}" ${DEFAULT_CHECKED.includes(c) ? 'checked' : ''}> ${c}</label>`)
+        .join('');
+    }
+    $('vct').addEventListener('change', renderClaims);
+    renderClaims();
+
+    $('gerar-qr').addEventListener('click', async () => {
+      const vct = $('vct').value;
+      const claims = [...document.querySelectorAll('#claims input:checked')].map((el) => el.value);
+      if (claims.length === 0) { alert('Selecione ao menos uma claim.'); return; }
+
+      const res = await fetch('/verifier/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vct, requested_claims: claims }),
+      });
+      const sessao = await res.json();
+      if (!res.ok) { alert('Erro: ' + (sessao.error_description || sessao.error)); return; }
+
+      $('sessao-area').hidden = false;
+      $('sessao-qr').src = sessao.qrcode_png_base64;
+      $('sessao-deeplink').textContent = sessao.request_deeplink;
+      $('sessao-status').className = 'status pending';
+      $('sessao-status').textContent = 'Aguardando apresentação…';
+      $('sessao-resultado').innerHTML = '';
+
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = setInterval(async () => {
+        const r = await fetch('/verifier/sessions/' + sessao.id);
+        const s = await r.json();
+        if (s.status === 'pending') return;
+        clearInterval(pollTimer);
+        const el = $('sessao-status');
+        if (s.status === 'verified') {
+          el.className = 'status verified';
+          el.textContent = '✔ Apresentação verificada';
+          const linhas = Object.entries(s.claims || {})
+            .map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`)
+            .join('');
+          $('sessao-resultado').innerHTML =
+            `<table><thead><tr><th>Claim</th><th>Valor</th></tr></thead><tbody>${linhas}</tbody></table>`;
+        } else {
+          el.className = 'status rejected';
+          el.textContent = '✘ Apresentação rejeitada — motivo: ' + (s.reason || 'desconhecido');
+        }
+      }, 2000);
+    });
+
+    $('copiar-deeplink').addEventListener('click', () =>
+      navigator.clipboard.writeText($('sessao-deeplink').textContent));
+    $('copiar-oferta').addEventListener('click', () =>
+      navigator.clipboard.writeText($('oferta-deeplink').textContent));
+
+    async function carregarServidores() {
+      const res = await fetch('/sou-sp/servidores');
+      const servidores = await res.json();
+      $('servidores').innerHTML = servidores
+        .map((s) => `
+          <tr>
+            <td>${esc(s.nome)}</td>
+            <td>${esc(s.cpfMascarado)}</td>
+            <td>${esc(s.cargo)}</td>
+            <td>${esc(s.orgao)}</td>
+            <td>${s.vinculoAtivo ? 'Ativo' : 'Inativo'}</td>
+            <td><button class="primario" data-cpf="${esc(s.cpf)}">Emitir</button></td>
+          </tr>`)
+        .join('');
+    }
+    carregarServidores();
+
+    $('servidores').addEventListener('click', async (ev) => {
+      const cpf = ev.target?.dataset?.cpf;
+      if (!cpf) return;
+      $('oferta-erro').hidden = true;
+      const res = await fetch('/issuer/credential-offers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cpf, vct: $('vct-emissao').value }),
+      });
+      const oferta = await res.json();
+      if (!res.ok) {
+        $('oferta-area').hidden = true;
+        $('oferta-erro').hidden = false;
+        $('oferta-erro').textContent = 'Erro ao criar oferta: ' + (oferta.error_description || oferta.error);
+        return;
+      }
+      $('oferta-area').hidden = false;
+      $('oferta-qr').src = oferta.qrcode_png_base64;
+      $('oferta-txcode').textContent = oferta.tx_code;
+      $('oferta-deeplink').textContent = oferta.offer_deeplink;
+    });
+  </script>
+</body>
+</html>
