@@ -2,7 +2,13 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
     {
-      "source": "/:path(.*)",
+      "source": "/.well-known/:path(.*)",
+      "has": [{ "type": "host", "value": "agent.sovereignid.cloud" }],
+      "destination": "https://agent.luure.com.br/.well-known/:path",
+      "permanent": true
+    },
+    {
+      "source": "/:path((?!health$).*)",
       "has": [{ "type": "host", "value": "agent.sovereignid.cloud" }],
       "destination": "https://agent.luure.com.br/:path",
       "permanent": true
