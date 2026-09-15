@@ -107,8 +107,8 @@
 
       <label for="vct">Tipo de credencial</label>
       <select id="vct">
-        <option value="urn:sovereignid:sp:funcional">Carteira Funcional</option>
-        <option value="urn:sovereignid:sp:margem-consignavel">Margem Consignável</option>
+        <option value="urn:luure:sp:funcional">Carteira Funcional</option>
+        <option value="urn:luure:sp:margem-consignavel">Margem Consignável</option>
       </select>
 
       <label>Claims a solicitar</label>
@@ -142,8 +142,8 @@
 
       <label for="vct-emissao">Tipo de credencial a emitir</label>
       <select id="vct-emissao">
-        <option value="urn:sovereignid:sp:funcional">Carteira Funcional</option>
-        <option value="urn:sovereignid:sp:margem-consignavel">Margem Consignável</option>
+        <option value="urn:luure:sp:funcional">Carteira Funcional</option>
+        <option value="urn:luure:sp:margem-consignavel">Margem Consignável</option>
       </select>
 
       <div id="oferta-area" hidden>
@@ -164,11 +164,11 @@
 
   <script>
     const CLAIMS = {
-      'urn:sovereignid:sp:funcional': [
+      'urn:luure:sp:funcional': [
         'nome', 'cpf_mascarado', 'matricula', 'cargo', 'orgao',
         'secretaria', 'vinculo_ativo', 'data_admissao', 'foto_hash',
       ],
-      'urn:sovereignid:sp:margem-consignavel': [
+      'urn:luure:sp:margem-consignavel': [
         'matricula', 'margem_disponivel_centavos', 'faixa_margem', 'competencia',
       ],
     };

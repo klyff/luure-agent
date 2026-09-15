@@ -2,7 +2,11 @@ import { createHash, randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import * as jose from 'jose';
 import { nanoid } from 'nanoid';
-import { config, isAllowedWalletRedirectUri } from '../../lib/config.js';
+import {
+  config,
+  isAllowedWalletClientId,
+  isAllowedWalletRedirectUri,
+} from '../../lib/config.js';
 import { prisma } from '../../lib/db.js';
 import {
   ephemeralDelete,
@@ -148,10 +152,10 @@ export async function govbrRoutes(app: FastifyInstance): Promise<void> {
       cpf,
     } = request.query;
 
-    if (client_id !== config.walletClientId) {
+    if (!isAllowedWalletClientId(client_id)) {
       return reply.code(400).send({
         error: 'invalid_client',
-        error_description: `client_id inválido (esperado ${config.walletClientId})`,
+        error_description: `client_id inválido (esperado ${config.walletClientIds.join(' ou ')})`,
       });
     }
     if (!code_challenge || (code_challenge_method ?? 'S256') !== 'S256') {
@@ -224,7 +228,7 @@ export async function govbrRoutes(app: FastifyInstance): Promise<void> {
     const { grant_type, code, code_verifier, redirect_uri, client_id } = request.body ?? {};
 
     // FINDINGS A-03: client_id, quando enviado, deve ser o registrado.
-    if (client_id !== undefined && client_id !== config.walletClientId) {
+    if (client_id !== undefined && !isAllowedWalletClientId(client_id)) {
       return reply.code(400).send({
         error: 'invalid_client',
         error_description: 'client_id não registrado',

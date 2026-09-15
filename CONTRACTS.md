@@ -1,7 +1,7 @@
 # CONTRACTS.md — Contrato Wallet ↔ Agent Server (PoC SOU.SP 2.0)
 
-Este documento é a fonte de verdade dos contratos de API entre `sovereignid-wallet`
-(React Native) e `sovereignid-agent-server` (Node/Fastify). Qualquer mudança deve ser
+Este documento é a fonte de verdade dos contratos de API entre `luure-wallet-reactnative`
+(React Native) e `luure-agent-server` (Node/Fastify). Qualquer mudança deve ser
 refletida aqui ANTES de alterar o código.
 
 Base URL (dev): `http://localhost:3100` (no simulador iOS use `localhost`; no emulador
@@ -16,8 +16,8 @@ carregam Key Binding JWT (KB-JWT). O payload inclui `jti` (id do registro
 
 | vct | Descrição | Claims (todas seletivamente divulgáveis, exceto `vct`, `iss`, `cnf`) |
 |---|---|---|
-| `urn:sovereignid:sp:funcional` | Carteira Funcional Digital do servidor público SP | `nome`, `cpf_mascarado`, `matricula`, `cargo`, `orgao`, `secretaria`, `vinculo_ativo` (bool), `data_admissao`, `foto_hash` |
-| `urn:sovereignid:sp:margem-consignavel` | Margem consignável | `matricula`, `margem_disponivel_centavos` (int), `faixa_margem` (`"ATE_500"`, `"500_A_1500"`, `"ACIMA_1500"`), `competencia` (`YYYY-MM`) |
+| `urn:luure:sp:funcional` | Carteira Funcional Digital do servidor público SP | `nome`, `cpf_mascarado`, `matricula`, `cargo`, `orgao`, `secretaria`, `vinculo_ativo` (bool), `data_admissao`, `foto_hash` |
+| `urn:luure:sp:margem-consignavel` | Margem consignável | `matricula`, `margem_disponivel_centavos` (int), `faixa_margem` (`"ATE_500"`, `"500_A_1500"`, `"ACIMA_1500"`), `competencia` (`YYYY-MM`) |
 
 ## 1. Mock IdP gov.br (OIDC, authorization code + PKCE)
 
@@ -26,7 +26,10 @@ carregam Key Binding JWT (KB-JWT). O payload inclui `jti` (id do registro
 - `POST /govbr/token` — `grant_type=authorization_code`, retorna `{ access_token, id_token, token_type, expires_in }`. `id_token` inclui `amr`, `nivel_conta` (`"prata"` | `"ouro"`).
 - `GET /govbr/userinfo` — Bearer; retorna `{ sub (cpf), name, nivel_conta }`.
 
-Client registrado para a wallet: `client_id=sovereignid-wallet`, `redirect_uri=sovereignid://govbr/callback` (e `http://localhost:8081/govbr/callback` para dev web).
+O login gov.br é **IdP mock**. `client_id` da POC: `luure-wallet-sou20-gov-sp`
+(`WALLET_CLIENT_IDS` CSV sobrescreve). MVP/Dev/Staging/Prod = TBD. Prod futuro
+pode usar identidade Narrative mTLS. `redirect_uri`: `sou20://govbr/callback`,
+`luure://govbr/callback`, `sovereignid://govbr/callback`, `http://localhost:8081/govbr/callback`.
 
 ## 2. Issuer (OID4VCI, fluxo pre-authorized code)
 

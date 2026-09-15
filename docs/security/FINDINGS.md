@@ -1,7 +1,7 @@
 # Achados de Segurança — Revisão Onda 2 (código existente em 2026-07-06)
 
-Escopo revisado: todo o `src/` de `sovereignid-agent-server` (módulos `govbr-mock`,
-`sou-sp`, libs, testes, Prisma) e todo o `src/` de `sovereignid-wallet` (Onda 1: UI
+Escopo revisado: todo o `src/` de `luure-agent-server` (módulos `govbr-mock`,
+`sou-sp`, libs, testes, Prisma) e todo o `src/` de `luure-wallet-reactnative` (Onda 1: UI
 com mocks, sem wallet core criptográfico ainda). Issuer OID4VCI, Verifier OID4VP e
 Status List ainda não existem no código — cobertos por `CHECKLIST_ONDA2.md`.
 
@@ -121,9 +121,9 @@ Resumo: 0 críticos · 1 alto · 3 médios · 4 baixos · 3 informativos.
 > `login.tsx`). Restam apenas `console.warn` de erro de persistência em
 > `wallet-store.ts`/`activity-store.ts`, sem PII. Achado original abaixo.
 
-- **Evidência**: `sovereignid-wallet/src/app/scan.tsx:22`
+- **Evidência**: `luure-wallet-reactnative/src/app/scan.tsx:22`
   (`console.log("[scan] valor capturado:", value)`) e
-  `sovereignid-wallet/src/app/present.tsx:45`
+  `luure-wallet-reactnative/src/app/present.tsx:45`
   (`console.log("[present] claims compartilhadas:", ...)`).
 - **Impacto**: hoje só dados mock; na Onda 2 esses mesmos pontos manipularão
   deeplinks com `credential_offer_uri`/`pre-authorized_code` e claims reais —
@@ -193,7 +193,7 @@ Resumo: 0 críticos · 1 alto · 3 médios · 4 baixos · 3 informativos.
 | P-08 | Modelo de dados já preparado para as garantias da Onda 2: `CredentialOffer.status` (single-use do pre-auth code), `VerificationSession.state @unique`, `CredentialIssued.statusListIndex @unique` | `prisma/schema.prisma:36, 49, 62` |
 | P-09 | Helper de mascaramento de CPF centralizado e testado | `src/modules/sou-sp/routes.ts:4-7`; `app.test.ts:49-56` |
 | P-10 | Stack SD-JWT baseada em bibliotecas mantidas (`@sd-jwt/core`, `@sd-jwt/sd-jwt-vc`, `jose`) em vez de cripto artesanal | `package.json` do agent-server |
-| P-11 | UX da wallet já modela consentimento e divulgação seletiva por claim (checkbox por claim, nada enviado sem ação do usuário) | `sovereignid-wallet/src/app/present.tsx:29-40` |
+| P-11 | UX da wallet já modela consentimento e divulgação seletiva por claim (checkbox por claim, nada enviado sem ação do usuário) | `luure-wallet-reactnative/src/app/present.tsx:29-40` |
 
 ---
 
@@ -259,7 +259,7 @@ autenticidade, binding ou confidencialidade dentro do modelo de ameaça da PoC.
 ### A-14 — Wallet não valida a assinatura do issuer ao receber a credencial
 
 - **Severidade**: Média.
-- **Evidência**: `sovereignid-wallet/src/core/oid4vci.ts:174` — `receiveCredential`
+- **Evidência**: `luure-wallet-reactnative/src/core/oid4vci.ts:174` — `receiveCredential`
   chama apenas `parseSdJwt`, que decodifica e confere os digests das disclosures
   (`src/core/sdjwt.ts:66-82`) mas **não verifica a assinatura ES256 do issuer** nem
   compara `iss` com o `credential_issuer` da oferta antes de armazenar. A função

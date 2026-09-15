@@ -1,7 +1,7 @@
-# QA — PoC SovereignID (SOU.SP 2.0) — Onda 3
+# QA — PoC Luure (SOU.SP 2.0) — Onda 3
 
-Documento de QA espelhado nos dois repositórios (`sovereignid-agent-server` e
-`sovereignid-wallet`). Consolida a matriz de testes, como rodar cada suíte, o
+Documento de QA espelhado nos dois repositórios (`luure-agent-server` e
+`luure-wallet-reactnative`). Consolida a matriz de testes, como rodar cada suíte, o
 resultado da última execução e o checklist manual da demo.
 
 Repositórios:
@@ -103,7 +103,7 @@ Ambiente: macOS com simulador iOS, servidor da PoC e app em dev build.
 
 ### Passo 0 — Subir o servidor
 ```bash
-cd sovereignid-agent-server
+cd luure-agent-server
 npm run seed          # popula 5 servidores do seed SOU.SP
 npm start             # sobe em http://localhost:3100
 ```
@@ -117,10 +117,10 @@ e criar sessão de verificação.
 
 ### Passo 2 — Rodar o app e chegar no login
 ```bash
-cd sovereignid-wallet
+cd luure-wallet-reactnative
 npx expo run:ios
 ```
-**Esperado:** app abre no onboarding ("SovereignID"). Tocar em **Começar** leva
+**Esperado:** app abre no onboarding ("Luure"). Tocar em **Começar** leva
 à tela **Entrar** com o botão "Entrar com gov.br".
 
 ### Passo 3 — Login gov.br (mock)

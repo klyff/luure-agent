@@ -37,7 +37,7 @@ const TEST_SERVIDOR = {
   nivelContaGovbr: 'ouro',
 };
 
-const VCT_FUNCIONAL = 'urn:sovereignid:sp:funcional';
+const VCT_FUNCIONAL = 'urn:luure:sp:funcional';
 const PRE_AUTH_GRANT = 'urn:ietf:params:oauth:grant-type:pre-authorized_code';
 
 let app: FastifyInstance;
@@ -427,7 +427,7 @@ describe('gov.br mock: allowlist de redirect_uri e XSS (extras do checklist)', (
       method: 'GET',
       url: '/govbr/authorize',
       query: {
-        client_id: 'sovereignid-wallet',
+        client_id: 'luure-wallet-sou20-gov-sp',
         redirect_uri: 'https://atacante.example/callback',
         code_challenge: 'abc',
         code_challenge_method: 'S256',
@@ -445,7 +445,7 @@ describe('gov.br mock: allowlist de redirect_uri e XSS (extras do checklist)', (
       method: 'GET',
       url: '/govbr/authorize',
       query: {
-        client_id: 'sovereignid-wallet',
+        client_id: 'luure-wallet-sou20-gov-sp',
         redirect_uri: 'http://localhost:8081/govbr/callback',
         code_challenge: 'abc',
         code_challenge_method: 'S256',

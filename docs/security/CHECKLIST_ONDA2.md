@@ -4,7 +4,7 @@ Verificação sobre o CÓDIGO FINAL. **Revalidação linha a linha em 2026-07-06
 (Onda 3, review final)**: Issuer (`src/modules/issuer/routes.ts`), Verifier
 (`src/modules/verifier/routes.ts`), Status List (`src/modules/status/routes.ts`),
 lib SD-JWT server (`src/lib/sdjwt.ts`) e wallet core
-(`sovereignid-wallet/src/core/*`) já existem e foram lidos. Cada item traz agora
+(`luure-wallet-reactnative/src/core/*`) já existem e foram lidos. Cada item traz agora
 status ✅/⚠️/❌ com evidência `arquivo:linha`.
 
 Convenção de status:
@@ -45,7 +45,7 @@ corretos; `c_nonce` reutilizável e sem janela de `iat`/checagem de `typ` (A-12)
 
 ⚠️ **PARCIAL** — wallet envia só o selecionado; verifier NÃO filtra o excedente (A-13).
 
-- ✅ Wallet envia SOMENTE as disclosures selecionadas: `selectDisclosures(parsed, selectedClaims)` filtra pelo nome da claim (`sovereignid-wallet/src/core/sdjwt.ts:115-118, 140`); `present.tsx` só marca as `requestedClaims` por padrão e envia `[...selected]` após consentimento (`src/app/present.tsx:79, 149`).
+- ✅ Wallet envia SOMENTE as disclosures selecionadas: `selectDisclosures(parsed, selectedClaims)` filtra pelo nome da claim (`luure-wallet-reactnative/src/core/sdjwt.ts:115-118, 140`); `present.tsx` só marca as `requestedClaims` por padrão e envia `[...selected]` após consentimento (`src/app/present.tsx:79, 149`).
 - ❌ **Verifier não impõe a minimização**: `validatePresentation` devolve TODAS as disclosures presentes no `vp_token` sem filtrar contra `session.requestedClaims` (`src/modules/verifier/routes.ts:82-88`) e grava tudo em `resultClaims` (`:198`). Uma wallet que enviar disclosure extra a repassa integralmente ao portal. Ver **A-13**.
 - ⚠️ Teste negativo ausente: o e2e verifica que claims não divulgadas não aparecem (`src/__tests__/oid4vc.test.ts:266-269`), mas isso decorre de a wallet honesta enviar só o selecionado — não testa o descarte no verifier de disclosure não solicitada.
 
@@ -67,7 +67,7 @@ corretos; `c_nonce` reutilizável e sem janela de `iat`/checagem de `typ` (A-12)
 - Teste automatizado do caminho feliz e do verifier errado: `src/__tests__/app.test.ts:71-144` e `:146-178`.
 
 ✅ **COBERTO** (lado wallet, código final):
-- ✅ `code_verifier` com CSPRNG: `randomBase64Url(32)` usa `Crypto.getRandomValues` do `expo-crypto` (`sovereignid-wallet/src/app/login.tsx:24-25, 40`); 32 bytes → 43 chars base64url. Não é logado (nenhum `console.log` em `login.tsx`).
+- ✅ `code_verifier` com CSPRNG: `randomBase64Url(32)` usa `Crypto.getRandomValues` do `expo-crypto` (`luure-wallet-reactnative/src/app/login.tsx:24-25, 40`); 32 bytes → 43 chars base64url. Não é logado (nenhum `console.log` em `login.tsx`).
 - ✅ `state` validado no callback: `callbackParams["state"] !== state` lança erro (`login.tsx:66-68`); `state` também gerado com CSPRNG (`:42`).
 - ✅ Servidor agora valida `redirect_uri` contra allowlist e re-confere no token (A-01 corrigido, ver §Extras).
 
@@ -88,7 +88,7 @@ corretos; `c_nonce` reutilizável e sem janela de `iat`/checagem de `typ` (A-12)
 ⚠️ **PARCIAL** — verifier valida a assinatura do issuer; **a wallet NÃO valida ao receber** (A-14).
 
 - ✅ Verifier valida a assinatura do issuer de fato: `createVerifierInstance` injeta `verifier: getIssuerVerifier()` (chave pública ES256) e `instance.verify` roda a verificação (`src/lib/sdjwt.ts:46-51, 72-80`; `verifier/routes.ts:36-39`). Não desserializa payload sem verificar. Usa a chave pública local (mesmo processo) em vez de resolver por `kid` no JWKS — aceitável na PoC.
-- ❌ **Wallet confia cegamente na credencial recebida**: `receiveCredential` só faz `parseSdJwt` (`sovereignid-wallet/src/core/oid4vci.ts:174`), que decodifica e confere digests das disclosures (`src/core/sdjwt.ts:66-82`) mas **não verifica a assinatura do issuer** nem confere `iss` == `credential_issuer` antes de armazenar. `verifyJwtSignature` existe (`src/core/crypto.ts:144`) e é testada, porém **nunca é chamada no fluxo do app** (só em `scripts/core-tests.ts`). Ver **A-14**.
+- ❌ **Wallet confia cegamente na credencial recebida**: `receiveCredential` só faz `parseSdJwt` (`luure-wallet-reactnative/src/core/oid4vci.ts:174`), que decodifica e confere digests das disclosures (`src/core/sdjwt.ts:66-82`) mas **não verifica a assinatura do issuer** nem confere `iss` == `credential_issuer` antes de armazenar. `verifyJwtSignature` existe (`src/core/crypto.ts:144`) e é testada, porém **nunca é chamada no fluxo do app** (só em `scripts/core-tests.ts`). Ver **A-14**.
 - ⚠️ Teste negativo (SD-JWT com outra chave → rejeitado): existe para o KB/portal no verifier; do lado wallet, `verifyJwtSignature` é testada isoladamente (`scripts/core-tests.ts:132-163`), mas não protege o recebimento real.
 - ✅/⚠️ `alg`: o verifier server só aceita ES256 (assinatura ECDSA P-256 falha para `none`/`HS256`); a wallet, por não verificar no recebimento, não impõe `alg` algum nesse ponto (A-14).
 
@@ -106,5 +106,5 @@ corretos; `c_nonce` reutilizável e sem janela de `iat`/checagem de `typ` (A-12)
 - ✅ `redirect_uri` re-conferido no `/govbr/token` contra o do authorize (A-01 — `routes.ts:243-249`).
 - ✅ Escape do NOME e do VALOR do parâmetro + allowlist de params na página de login do mock (A-02 corrigido — `routes.ts:31-57`, `escapeHtml` + `FORWARDED_AUTHORIZE_PARAMS`).
 - ✅ `client_id` conferido no `/govbr/token` quando enviado (A-03 corrigido — `routes.ts:209-215`).
-- ✅ Biometria (`expo-local-authentication`) exigida antes de assinar o KB-JWT na apresentação (`sovereignid-wallet/src/app/present.tsx:116-142`); em aparelho sem biometria, segue com aviso explícito (aceitável na PoC).
+- ✅ Biometria (`expo-local-authentication`) exigida antes de assinar o KB-JWT na apresentação (`luure-wallet-reactnative/src/app/present.tsx:116-142`); em aparelho sem biometria, segue com aviso explícito (aceitável na PoC).
 - ⚠️ Novo (A-15): portal usa `innerHTML` com dados vindos da apresentação/seed (`web/index.html:219-223, 240-248`) — não explorável hoje (dados são assinados pelo issuer/seed), mas trocar por `textContent` é defesa em profundidade barata.

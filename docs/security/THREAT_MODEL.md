@@ -1,7 +1,7 @@
 # Modelo de Ameaças — PoC SOU.SP 2.0 (Onda 2)
 
-> Agente de segurança — Onda 2. Escopo: `sovereignid-wallet` (holder) e
-> `sovereignid-agent-server` (mock IdP gov.br + Issuer OID4VCI + Verifier OID4VP +
+> Agente de segurança — Onda 2. Escopo: `luure-wallet-reactnative` (holder) e
+> `luure-agent-server` (mock IdP gov.br + Issuer OID4VCI + Verifier OID4VP +
 > Token Status List). Snapshot do código em 2026-07-06: servidor com módulos
 > `govbr-mock` e `sou-sp` implementados; Issuer/Verifier/Status List ainda em
 > desenvolvimento (analisados pela spec do `CONTRACTS.md`). Wallet ainda na Onda 1

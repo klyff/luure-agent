@@ -30,7 +30,7 @@ const TEST_SERVIDOR_INATIVO = {
   vinculoAtivo: false,
 };
 
-const VCT_FUNCIONAL = 'urn:sovereignid:sp:funcional';
+const VCT_FUNCIONAL = 'urn:luure:sp:funcional';
 const PRE_AUTH_GRANT = 'urn:ietf:params:oauth:grant-type:pre-authorized_code';
 
 let app: FastifyInstance;
@@ -176,7 +176,7 @@ describe('metadata OID4VCI', () => {
     expect(meta.credential_issuer).toBe(config.baseUrl);
     const configs = meta.credential_configurations_supported;
     expect(configs[VCT_FUNCIONAL].format).toBe('dc+sd-jwt');
-    expect(configs['urn:sovereignid:sp:margem-consignavel'].format).toBe('dc+sd-jwt');
+    expect(configs['urn:luure:sp:margem-consignavel'].format).toBe('dc+sd-jwt');
   });
 
   it('jwks.json expõe a chave pública do issuer', async () => {

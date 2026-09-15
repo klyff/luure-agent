@@ -1,7 +1,7 @@
 # Gate Final de Segurança — Onda 3 (review final)
 
-PoC de identidade soberana SOU.SP 2.0 · `sovereignid-agent-server` +
-`sovereignid-wallet` · Review linha a linha do código criptográfico e de
+PoC de identidade soberana SOU.SP 2.0 · `luure-agent-server` +
+`luure-wallet-reactnative` · Review linha a linha do código criptográfico e de
 protocolo (OID4VCI / OID4VP / SD-JWT VC / Token Status List). Data: 2026-07-06.
 
 ---

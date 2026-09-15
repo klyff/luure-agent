@@ -6,7 +6,7 @@ const app = await buildApp();
 
 try {
   await app.listen({ port: config.port, host: '0.0.0.0' });
-  console.log(`sovereignid-agent-server ouvindo em ${config.baseUrl}`);
+  console.log(`luure-agent-server ouvindo em ${config.baseUrl}`);
 } catch (err) {
   console.error(err);
   process.exit(1);

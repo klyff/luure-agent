@@ -80,7 +80,7 @@ describe('fluxo gov.br mock (authorization code + PKCE)', () => {
       method: 'GET',
       url: '/govbr/authorize',
       query: {
-        client_id: 'sovereignid-wallet',
+        client_id: 'luure-wallet-sou20-gov-sp',
         redirect_uri: redirectUri,
         code_challenge: codeChallenge,
         code_challenge_method: 'S256',
@@ -105,7 +105,7 @@ describe('fluxo gov.br mock (authorization code + PKCE)', () => {
         grant_type: 'authorization_code',
         code: code as string,
         code_verifier: codeVerifier,
-        client_id: 'sovereignid-wallet',
+        client_id: 'luure-wallet-sou20-gov-sp',
       }).toString(),
     });
     expect(tokenRes.statusCode).toBe(200);
@@ -122,7 +122,7 @@ describe('fluxo gov.br mock (authorization code + PKCE)', () => {
     const { publicKey } = getGovbrKeys();
     const { payload } = await jose.jwtVerify(tokens.id_token, publicKey, {
       issuer: config.govbrIssuer,
-      audience: 'sovereignid-wallet',
+      audience: 'luure-wallet-sou20-gov-sp',
     });
     expect(payload.sub).toBe(TEST_SERVIDOR.cpf);
     expect(payload.name).toBe(TEST_SERVIDOR.nome);
@@ -153,7 +153,7 @@ describe('fluxo gov.br mock (authorization code + PKCE)', () => {
       method: 'GET',
       url: '/govbr/authorize',
       query: {
-        client_id: 'sovereignid-wallet',
+        client_id: 'luure-wallet-sou20-gov-sp',
         redirect_uri: 'http://localhost:8081/govbr/callback',
         code_challenge: codeChallenge,
         code_challenge_method: 'S256',
@@ -182,7 +182,7 @@ describe('fluxo gov.br mock (authorization code + PKCE)', () => {
       method: 'GET',
       url: '/govbr/authorize',
       query: {
-        client_id: 'sovereignid-wallet',
+        client_id: 'luure-wallet-sou20-gov-sp',
         redirect_uri: 'http://localhost:8081/govbr/callback',
         code_challenge: 'abc',
         code_challenge_method: 'S256',

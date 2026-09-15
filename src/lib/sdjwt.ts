@@ -3,8 +3,8 @@ import { ES256, digest, generateSalt } from '@sd-jwt/crypto-nodejs';
 import type { JwtPayload, KbVerifier, Signer, Verifier } from '@sd-jwt/core';
 import { getIssuerKeys } from './keys.js';
 
-export const VCT_FUNCIONAL = 'urn:sovereignid:sp:funcional';
-export const VCT_MARGEM = 'urn:sovereignid:sp:margem-consignavel';
+export const VCT_FUNCIONAL = 'urn:luure:sp:funcional';
+export const VCT_MARGEM = 'urn:luure:sp:margem-consignavel';
 export const SUPPORTED_VCTS = [VCT_FUNCIONAL, VCT_MARGEM] as const;
 
 export const CLAIMS_BY_VCT: Record<string, string[]> = {
